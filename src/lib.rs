@@ -43,9 +43,9 @@ where
 
 
 /// Serialize an `Encode` implementation into binary data.
-pub fn encode(encodable: &impl Encode) -> Result<Vec<u8>> {
+pub fn encode(encodable: &impl Encode, endian: Endian) -> Result<Vec<u8>> {
     let mut stream = MemoryStream::new();
-    let writer = BinaryWriter::new(&mut stream, Endian::Big);
+    let writer = BinaryWriter::new(&mut stream, endian);
     let mut serializer = Serializer { writer };
     encodable.encode(&mut serializer)?;
     Ok(stream.into())
@@ -54,9 +54,9 @@ pub fn encode(encodable: &impl Encode) -> Result<Vec<u8>> {
 /// Deserialize a `Decode` implementation from binary data.
 ///
 /// The type must also implement the `Default` trait.
-pub fn decode<T: Decode + Default>(buffer: Vec<u8>) -> Result<T> {
+pub fn decode<T: Decode + Default>(buffer: Vec<u8>, endian: Endian) -> Result<T> {
     let mut stream: MemoryStream = buffer.into();
-    let reader = BinaryReader::new(&mut stream, Endian::Big);
+    let reader = BinaryReader::new(&mut stream, endian);
     let mut deserializer = Deserializer { reader };
     let mut decoded: T = T::default();
     decoded.decode(&mut deserializer)?;
@@ -378,8 +378,8 @@ mod tests {
             todos,
         };
 
-        let buffer = encode(&list)?;
-        let decoded: TodoList = decode(buffer)?;
+        let buffer = encode(&list, Default::default())?;
+        let decoded: TodoList = decode(buffer, Default::default())?;
         assert_eq!(list, decoded);
         Ok(())
     }

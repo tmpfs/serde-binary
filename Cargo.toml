@@ -1,6 +1,6 @@
 [package]
 name = "serde-binary"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["muji <muji@tmpfs.org>"]
 edition = "2021"
 
