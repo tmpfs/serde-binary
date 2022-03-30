@@ -41,7 +41,6 @@ where
     Ok(value)
 }
 
-
 /// Serialize an `Encode` implementation into binary data.
 pub fn encode(encodable: &impl Encode, endian: Endian) -> Result<Vec<u8>> {
     let mut stream = MemoryStream::new();
@@ -323,6 +322,8 @@ mod tests {
         Ok(())
     }
 
+    const MAGIC: [u8; 4] = [84, 79, 68, 79];
+
     #[derive(Debug, Eq, PartialEq)]
     struct TodoList {
         magic: [u8; 4],
@@ -332,7 +333,7 @@ mod tests {
     impl Default for TodoList {
         fn default() -> Self {
             Self {
-                magic: [84, 79, 68, 79],
+                magic: MAGIC,
                 todos: vec![],
             }
         }
@@ -348,11 +349,17 @@ mod tests {
 
     impl Decode for TodoList {
         fn decode(&mut self, de: &mut Deserializer) -> super::Result<()> {
-            self.magic = de.reader.read_bytes(4)?.as_slice().try_into()
-                .map_err(|_| {
-                    Error::Message(
-                        "cannot convert magic bytes to slice".to_string())
-                })?;
+            self.magic = de
+                .reader
+                .read_bytes(4)?
+                .as_slice()
+                .try_into()
+                .map_err(|_| Error::Message("cannot convert magic bytes to slice".to_string()))?;
+
+            if self.magic != MAGIC {
+                return Err(Error::Message("not a todo list binary file".to_string()));
+            }
+
             self.todos = Deserialize::deserialize(de)?;
             Ok(())
         }
@@ -366,12 +373,10 @@ mod tests {
 
     #[test]
     fn serde_mixed() -> Result<()> {
-        let todos = vec![
-            Todo {
-                name: String::from("foo"),
-                note: String::from("bar")
-            }
-        ];
+        let todos = vec![Todo {
+            name: String::from("foo"),
+            note: String::from("bar"),
+        }];
 
         let list = TodoList {
             magic: [84, 79, 68, 79],
