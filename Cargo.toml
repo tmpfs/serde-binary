@@ -1,0 +1,22 @@
+[package]
+name = "serde-binary"
+version = "0.1.0"
+authors = ["muji <muji@tmpfs.org>"]
+edition = "2021"
+
+description = "Serde data format for binary files"
+repository = "https://github.com/tmpfs/serde-binary"
+readme = "README.md"
+keywords = ["binary", "data", "file format"]
+license = "MIT"
+
+[dependencies]
+thiserror = "1"
+serde = { version = "1", features = ["derive"] }
+
+[dependencies.binary_rw]
+version = "2"
+path = "../forks/binary-rs"
+
+[dev-dependencies]
+anyhow = "1"
