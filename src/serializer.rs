@@ -283,6 +283,11 @@ impl<'a, 'b> ser::Serializer for &'a mut Serializer<'b> {
     }
 
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq> {
+        if let Some(len) = len {
+            if len > u32::MAX as usize {
+                return Err(Error::TooManyItems);
+            }
+        }
         self.writer.write_u32(len.map(|l| l as u32).unwrap_or(0))?;
         Ok(SerializeArray { ser: self })
     }
@@ -302,6 +307,11 @@ impl<'a, 'b> ser::Serializer for &'a mut Serializer<'b> {
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap> {
+        if let Some(len) = len {
+            if len > u32::MAX as usize {
+                return Err(Error::TooManyItems);
+            }
+        }
         self.writer.write_u32(len.map(|l| l as u32).unwrap_or(0))?;
         Ok(SerializeObject { ser: self })
     }
