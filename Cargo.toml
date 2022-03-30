@@ -7,7 +7,7 @@ edition = "2021"
 description = "Serde data format for binary files"
 repository = "https://github.com/tmpfs/serde-binary"
 readme = "README.md"
-keywords = ["binary", "data", "file format"]
+keywords = ["serde", "binary", "data", "file", "format"]
 license = "MIT"
 
 [dependencies]
