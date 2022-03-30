@@ -42,7 +42,7 @@ where
 }
 
 
-/// Encode into a binary buffer.
+/// Serialize an `Encode` implementation into binary data.
 pub fn encode(encodable: &impl Encode) -> Result<Vec<u8>> {
     let mut stream = MemoryStream::new();
     let writer = BinaryWriter::new(&mut stream, Endian::Big);
@@ -51,7 +51,9 @@ pub fn encode(encodable: &impl Encode) -> Result<Vec<u8>> {
     Ok(stream.into())
 }
 
-/// Decode into a binary buffer.
+/// Deserialize a `Decode` implementation from binary data.
+///
+/// The type must also implement the `Default` trait.
 pub fn decode<T: Decode + Default>(buffer: Vec<u8>) -> Result<T> {
     let mut stream: MemoryStream = buffer.into();
     let reader = BinaryReader::new(&mut stream, Endian::Big);
@@ -61,13 +63,13 @@ pub fn decode<T: Decode + Default>(buffer: Vec<u8>) -> Result<T> {
     Ok(decoded)
 }
 
-/// Trait for encoding to serializer.
+/// Trait for encoding using a serializer.
 pub trait Encode {
     /// Encode self into the serializer.
     fn encode(&self, ser: &mut Serializer) -> Result<()>;
 }
 
-/// Trait for decoding from binary.
+/// Trait for decoding using a deserializer.
 pub trait Decode {
     /// Decode from the deserializer into self.
     fn decode(&mut self, de: &mut Deserializer) -> Result<()>;
