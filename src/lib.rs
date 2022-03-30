@@ -1,7 +1,7 @@
 //! Serializer and deserializer for binary data.
 //!
-//! Sequences and maps that encode a length prefix use a `u32` for 
-//! portability across platforms which limits the number of 
+//! Sequences and maps that encode a length prefix use a `u32` for
+//! portability across platforms which limits the number of
 //! items in sequences and maps to 2^32.
 //!
 mod deserializer;
