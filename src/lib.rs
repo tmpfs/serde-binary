@@ -13,6 +13,7 @@ use serde::{de::Deserialize, de::DeserializeOwned, Serialize};
 use binary_rw::{BinaryReader, BinaryWriter, Endian, MemoryStream};
 
 pub use {deserializer::Deserializer, error::Error, serializer::Serializer};
+pub use binary_rw;
 
 /// Result type for serialization and deserialization.
 pub type Result<T> = std::result::Result<T, Error>;
@@ -40,6 +41,7 @@ where
     let value: T = Deserialize::deserialize(&mut deserializer)?;
     Ok(value)
 }
+
 
 /// Serialize an `Encode` implementation into binary data.
 pub fn encode(encodable: &impl Encode, endian: Endian) -> Result<Vec<u8>> {
@@ -349,15 +351,15 @@ mod tests {
 
     impl Decode for TodoList {
         fn decode(&mut self, de: &mut Deserializer) -> super::Result<()> {
-            self.magic = de
-                .reader
-                .read_bytes(4)?
-                .as_slice()
-                .try_into()
-                .map_err(|_| Error::Message("cannot convert magic bytes to slice".to_string()))?;
+            self.magic = de.reader.read_bytes(4)?.as_slice().try_into()
+                .map_err(|_| {
+                    Error::Message(
+                        "cannot convert magic bytes to slice".to_string())
+                })?;
 
             if self.magic != MAGIC {
-                return Err(Error::Message("not a todo list binary file".to_string()));
+                return Err(
+                    Error::Message("not a todo list binary file".to_string()));
             }
 
             self.todos = Deserialize::deserialize(de)?;
@@ -373,10 +375,12 @@ mod tests {
 
     #[test]
     fn serde_mixed() -> Result<()> {
-        let todos = vec![Todo {
-            name: String::from("foo"),
-            note: String::from("bar"),
-        }];
+        let todos = vec![
+            Todo {
+                name: String::from("foo"),
+                note: String::from("bar")
+            }
+        ];
 
         let list = TodoList {
             magic: [84, 79, 68, 79],
