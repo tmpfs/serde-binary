@@ -19,6 +19,10 @@ pub enum Error {
     /// Error generated converting to slices.
     #[error(transparent)]
     TryFromSlice(#[from] std::array::TryFromSliceError),
+
+    /// Generic error type for user space errors.
+    #[error(transparent)]
+    Boxed(#[from] Box<dyn std::error::Error + Send + Sync>),
 }
 
 impl serde::ser::Error for Error {
