@@ -351,12 +351,7 @@ mod tests {
 
     impl Decode for TodoList {
         fn decode(&mut self, de: &mut Deserializer) -> super::Result<()> {
-            self.magic = de.reader.read_bytes(4)?.as_slice().try_into()
-                .map_err(|_| {
-                    Error::Message(
-                        "cannot convert magic bytes to slice".to_string())
-                })?;
-
+            self.magic = de.reader.read_bytes(4)?.as_slice().try_into()?;
             if self.magic != MAGIC {
                 return Err(
                     Error::Message("not a todo list binary file".to_string()));
