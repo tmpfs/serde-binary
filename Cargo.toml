@@ -1,6 +1,6 @@
 [package]
 name = "serde-binary"
-version = "0.3.3"
+version = "0.3.4"
 authors = ["muji <muji@tmpfs.org>"]
 edition = "2021"
 
@@ -15,9 +15,9 @@ thiserror = "1"
 serde = { version = "1", features = ["derive"] }
 
 [dependencies.binary_rw]
-version = "2.0.3"
+version = "3.0.0"
 features = ["wasm32"]
-#path = "../forks/binary-rs"
+path = "../forks/binary-rs"
 
 [dev-dependencies]
 anyhow = "1"

@@ -10,7 +10,7 @@ mod serializer;
 
 use serde::{de::Deserialize, de::DeserializeOwned, Serialize};
 
-use binary_rw::{BinaryReader, BinaryWriter, Endian, MemoryStream};
+use binary_rw::{BinaryReader, BinaryWriter, Endian, MemoryStream, SliceStream};
 
 pub use binary_rw;
 pub use {deserializer::Deserializer, error::Error, serializer::Serializer};
@@ -36,6 +36,18 @@ where
     T: DeserializeOwned,
 {
     let mut stream: MemoryStream = value.into();
+    let reader = BinaryReader::new(&mut stream, endian);
+    let mut deserializer = Deserializer { reader };
+    let value: T = Deserialize::deserialize(&mut deserializer)?;
+    Ok(value)
+}
+
+/// Deserialize from a slice of bytes.
+pub fn from_slice<T>(value: &[u8], endian: Endian) -> Result<T>
+where
+    T: DeserializeOwned,
+{
+    let mut stream = SliceStream::new(value);
     let reader = BinaryReader::new(&mut stream, endian);
     let mut deserializer = Deserializer { reader };
     let value: T = Deserialize::deserialize(&mut deserializer)?;
