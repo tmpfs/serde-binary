@@ -66,8 +66,8 @@ pub fn encode(encodable: &impl Encode, endian: Endian) -> Result<Vec<u8>> {
 /// Deserialize a `Decode` implementation from binary data.
 ///
 /// The type must also implement the `Default` trait.
-pub fn decode<T: Decode + Default>(buffer: Vec<u8>, endian: Endian) -> Result<T> {
-    let mut stream: MemoryStream = buffer.into();
+pub fn decode<T: Decode + Default>(buffer: &[u8], endian: Endian) -> Result<T> {
+    let mut stream = SliceStream::new(buffer);
     let reader = BinaryReader::new(&mut stream, endian);
     let mut deserializer = Deserializer { reader };
     let mut decoded: T = T::default();
@@ -391,7 +391,7 @@ mod tests {
         };
 
         let buffer = encode(&list, Default::default())?;
-        let decoded: TodoList = decode(buffer, Default::default())?;
+        let decoded: TodoList = decode(&buffer, Default::default())?;
         assert_eq!(list, decoded);
         Ok(())
     }
