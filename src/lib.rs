@@ -10,9 +10,9 @@ mod serializer;
 
 use serde::{de::Deserialize, de::DeserializeOwned, Serialize};
 
-use binary_rw::{BinaryReader, BinaryWriter, Endian, MemoryStream, SliceStream};
+use binary_stream::{BinaryReader, BinaryWriter, Endian, MemoryStream, SliceStream};
 
-pub use binary_rw;
+pub use binary_stream;
 pub use {deserializer::Deserializer, error::Error, serializer::Serializer};
 
 /// Result type for serialization and deserialization.
@@ -364,7 +364,7 @@ mod tests {
         fn decode(&mut self, de: &mut Deserializer) -> super::Result<()> {
             self.magic = de.reader.read_bytes(4)?.as_slice().try_into()?;
             if self.magic != MAGIC {
-                return Err(Error::Message("not a todo list binary file".to_string()));
+                return Err(Error::Custom("not a todo list binary file".to_string()));
             }
 
             self.todos = Deserialize::deserialize(de)?;
