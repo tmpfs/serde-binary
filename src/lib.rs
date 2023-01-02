@@ -35,11 +35,7 @@ pub fn from_vec<T>(value: Vec<u8>, endian: Endian) -> Result<T>
 where
     T: DeserializeOwned,
 {
-    let mut stream: MemoryStream = value.into();
-    let reader = BinaryReader::new(&mut stream, endian);
-    let mut deserializer = Deserializer { reader };
-    let value: T = Deserialize::deserialize(&mut deserializer)?;
-    Ok(value)
+    from_slice(&value, endian)
 }
 
 /// Deserialize from a slice of bytes.
